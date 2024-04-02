@@ -17,10 +17,10 @@ async function connect() {
     await client.connect();
     db = client.db('bq'); // Reemplaza <NOMBRE_DB> por el nombre del db
     return db;
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    throw error;
   }
 }
-
 
 module.exports = { connect };

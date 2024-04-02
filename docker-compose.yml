@@ -1,12 +1,19 @@
 version: "3"
 services:
-  db:
     # TODO: Set up your database image, we recommend one of these:
     # https://hub.docker.com/_/mongo
     # https://hub.docker.com/_/postgres
     # https://hub.docker.com/_/mysql
-    networks:
-      - private
+    db:
+  image: mongo:4
+  volumes:
+    - ./db-data:/data/db
+  environment:
+    MONGO_INITDB_ROOT_USERNAME: bq
+    MONGO_INITDB_ROOT_PASSWORD: secret
+  restart: always
+  networks:
+    - private
   node:
     image: node:12 # https://hub.docker.com/_/node/
     user: node

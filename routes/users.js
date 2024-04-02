@@ -18,7 +18,7 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: "admin",
+    roles: 'admin',
   };
 
   // TODO: Create admin user
@@ -84,7 +84,6 @@ const initAdminUser = (app, next) => {
  */
 
 module.exports = (app, next) => {
-
   app.get('/users', requireAdmin, getUsers);
 
   app.get('/users/:uid', requireAuth, (req, resp) => {

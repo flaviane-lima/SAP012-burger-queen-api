@@ -7,9 +7,15 @@ const {
 
 const {
   getUsers,
+  createrUser,
+  getUserById,
+  updateUser,
+  deleteUser,
 } = require('../controller/users');
 
-const initAdminUser = (app, next) => {
+const { User: UserModel } = require('../model/User');
+
+const initAdminUser = async (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
   if (!adminEmail || !adminPassword) {
     return next();
@@ -18,8 +24,19 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: 'admin',
+    role: 'admin',
   };
+  try {
+    const user = await UserModel.findOne({ email: adminEmail });
+    if (!user) {
+      await UserModel.create(adminUser);
+      console.log('Usuário foi criado com sucesso!!');
+    } else {
+      console.log('O usuário já existe!!');
+    }
+  } catch (error) {
+    console.error('Erro ao criar usuário:', error);
+  }
 
   // TODO: Create admin user
   // First, check if adminUser already exists in the database
@@ -86,18 +103,13 @@ const initAdminUser = (app, next) => {
 module.exports = (app, next) => {
   app.get('/users', requireAdmin, getUsers);
 
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
+  app.get('/users/:uid', requireAuth, getUserById);
 
-  app.post('/users', requireAdmin, (req, resp, next) => {
-    // TODO: Implement the route to add new users
-  });
+  app.post('/users', requireAdmin, createrUser);
 
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.put('/users/:uid', requireAuth, updateUser);
 
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.delete('/users/:uid', requireAuth, deleteUser);
 
   initAdminUser(app, next);
 };

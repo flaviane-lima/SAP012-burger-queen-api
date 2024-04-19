@@ -13,9 +13,15 @@ module.exports = (app, nextMain) => {
     if (!email || !password) {
       return next(400);
     }
+    const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    if (!reg.test(email)) {
+      return resp.status(400).json({ message: 'email inválido' });
+    }
     try {
       // const db = await mongo.connect();
+
       const user = await UserModel.findOne({ email });
+
       // const user = await db.collection('users').findOne({ email });
       if (!user) {
         return resp.status(404).json({ message: 'Usuário não encontrado' });
@@ -26,7 +32,6 @@ module.exports = (app, nextMain) => {
       }
       // criando o token
       const token = jwt.sign(
-
         {
           id: user._id,
           role: user.role,

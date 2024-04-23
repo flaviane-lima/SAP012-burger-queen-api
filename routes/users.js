@@ -7,9 +7,15 @@ const {
 
 const {
   getUsers,
+  createUser,
+  getUserById,
+  updateUser,
+  deleteUser,
 } = require('../controller/users');
 
-const initAdminUser = (app, next) => {
+const { User: UserModel } = require('../model/User');
+
+const initAdminUser = async (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
   if (!adminEmail || !adminPassword) {
     return next();
@@ -18,8 +24,19 @@ const initAdminUser = (app, next) => {
   const adminUser = {
     email: adminEmail,
     password: bcrypt.hashSync(adminPassword, 10),
-    roles: 'admin',
+    role: 'admin',
   };
+  try {
+    const user = await UserModel.findOne({ email: adminEmail });
+    if (!user) {
+      await UserModel.create(adminUser);
+      console.log('Usuário foi criado com sucesso!!');
+    } else {
+      console.log('O usuário já existe!!');
+    }
+  } catch (error) {
+    console.error('Erro ao criar usuário:', error);
+  }
 
   // TODO: Create admin user
   // First, check if adminUser already exists in the database
@@ -27,34 +44,6 @@ const initAdminUser = (app, next) => {
 
   next();
 };
-
-/*
- * Español:
- *
- * Diagrama de flujo de una aplicación y petición en node - express :
- *
- * request  -> middleware1 -> middleware2 -> route
- *                                             |
- * response <- middleware4 <- middleware3   <---
- *
- * la gracia es que la petición va pasando por cada una de las funciones
- * intermedias o "middlewares" hasta llegar a la función de la ruta, luego esa
- * función genera la respuesta y esta pasa nuevamente por otras funciones
- * intermedias hasta responder finalmente a la usuaria.
- *
- * Un ejemplo de middleware podría ser una función que verifique que una usuaria
- * está realmente registrado en la aplicación y que tiene permisos para usar la
- * ruta. O también un middleware de traducción, que cambie la respuesta
- * dependiendo del idioma de la usuaria.
- *
- * Es por lo anterior que siempre veremos los argumentos request, response y
- * next en nuestros middlewares y rutas. Cada una de estas funciones tendrá
- * la oportunidad de acceder a la consulta (request) y hacerse cargo de enviar
- * una respuesta (rompiendo la cadena), o delegar la consulta a la siguiente
- * función en la cadena (invocando next). De esta forma, la petición (request)
- * va pasando a través de las funciones, así como también la respuesta
- * (response).
- */
 
 /*
  * Português Brasileiro:
@@ -86,18 +75,13 @@ const initAdminUser = (app, next) => {
 module.exports = (app, next) => {
   app.get('/users', requireAdmin, getUsers);
 
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
+  app.get('/users/:uid', requireAuth, getUserById);
 
-  app.post('/users', requireAdmin, (req, resp, next) => {
-    // TODO: Implement the route to add new users
-  });
+  app.post('/users', requireAdmin, createUser);
 
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.put('/users/:uid', requireAuth, updateUser);
 
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.delete('/users/:uid', requireAuth, deleteUser);
 
   initAdminUser(app, next);
 };

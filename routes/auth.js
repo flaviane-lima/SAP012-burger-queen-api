@@ -31,12 +31,10 @@ module.exports = (app, nextMain) => {
         return resp.status(401).json({ message: 'Senha incorreta' });
       }
       // criando o token
-      const token = jwt.sign(
-        {
-          id: user._id,
-          role: user.role,
-        }, secret,
-      );
+      const token = jwt.sign({
+        id: user._id,
+        role: user.role,
+      }, secret);
 
       return resp.status(200).json({
         message: 'Usuário encontado',

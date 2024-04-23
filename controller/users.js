@@ -19,11 +19,11 @@ module.exports = {
       const users = await UserService.getUserById(req.params.uid);
       resp.status(200).json(users);
     } catch (error) {
-      resp.status().json({ error: error.message });
+      resp.status(500).json({ error: error.message });
     }
   },
 
-  createrUser: async (req, resp) => {
+  createUser: async (req, resp) => {
     // TODO: Implement the necessary function to fetch the `users` collection or table
     if (!req.body.email || !req.body.password || !req.body.role) {
       return resp.status(400).json({ error: 'usuário precisa do email, da senha e do role' });
@@ -36,12 +36,12 @@ module.exports = {
     const hash = bcrypt.hashSync(req.body.password, salt);
 
     try {
-      const user = await UserService.createrUser({
+      const user = await UserService.createUser({
         email: req.body.email,
         password: hash,
         role: req.body.role,
       });
-      resp.json({ data: user, status: 'sucesso' });
+      resp.status(200).json({ data: user, status: 'sucesso' });
     } catch (error) {
       resp.status(500).json({ error: error.message });
     }
@@ -49,7 +49,7 @@ module.exports = {
   updateUser: async (req, resp) => {
     // TODO: Implement the necessary function to fetch the `users` collection or table
     try {
-      const users = await UserService.updateUser(req.params.id, {
+      const users = await UserService.updateUser(req.params.uid, {
         email: req.body.email,
         password: req.body.password,
         role: req.body.role,

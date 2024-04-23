@@ -7,7 +7,7 @@ const {
 
 const {
   getUsers,
-  createrUser,
+  createUser,
   getUserById,
   updateUser,
   deleteUser,
@@ -77,7 +77,7 @@ module.exports = (app, next) => {
 
   app.get('/users/:uid', requireAuth, getUserById);
 
-  app.post('/users', requireAdmin, createrUser);
+  app.post('/users', requireAdmin, createUser);
 
   app.put('/users/:uid', requireAuth, updateUser);
 
